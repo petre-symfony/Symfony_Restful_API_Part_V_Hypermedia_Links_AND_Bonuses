@@ -24,5 +24,9 @@ class BattleControllerTest extends ApiTestCase {
       'body'    => json_encode($data),
       'headers' => $this->getAuthorizedHeaders('weaverryan')
     ]);
+    $this->assertEquals(201, $response->getStatusCode());
+    $this->asserter()->assertResponsePropertyExists($response, 'didProgrammerWin');
+    //to do later
+    //$this->assertTrue($response->hasHeader('Location'))
   }
 }
