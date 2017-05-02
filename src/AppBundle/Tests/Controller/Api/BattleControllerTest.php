@@ -27,7 +27,8 @@ class BattleControllerTest extends ApiTestCase {
     ]);
     $this->assertEquals(201, $response->getStatusCode());
     $this->asserter()->assertResponsePropertyExists($response, 'didProgrammerWin');
-    $this->debugResponse($response);
+    $this->asserter()->assertResponsePropertyEquals($response, 'project', $project->getId());
+    $this->asserter()->assertResponsePropertyEquals($response, 'programmer', 'Fred');
     //to do later
     //$this->assertTrue($response->hasHeader('Location'))
   }
