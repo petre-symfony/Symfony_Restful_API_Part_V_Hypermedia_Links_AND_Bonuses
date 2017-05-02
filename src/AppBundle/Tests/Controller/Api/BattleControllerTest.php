@@ -40,7 +40,7 @@ class BattleControllerTest extends ApiTestCase {
     $this->asserter()->assertResponsePropertyEquals(
       $response,
       'errors.projectId[0]', 
-      'This value shpuld not be blank'
+      'This value should not be blank.'
     );
   }
 }
