@@ -15,5 +15,14 @@ class BattleControllerTest extends ApiTestCase {
       'nickname' => 'Fred'
     ], 'weaverryan');
     
+    $data = array(
+      'project'    => $project->getId(),
+      'programmer' => $programmer->getId()
+    );
+    
+    $response = $this->client->post('/api/battles', [
+      'body'    => json_encode($data),
+      'headers' => $this->getAuthorizedHeaders('weaverryan')
+    ]);
   }
 }
