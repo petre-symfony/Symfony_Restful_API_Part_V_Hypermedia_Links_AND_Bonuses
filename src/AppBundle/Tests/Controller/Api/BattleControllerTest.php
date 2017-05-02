@@ -12,7 +12,8 @@ class BattleControllerTest extends ApiTestCase {
   public function testPOSTCreateBattle(){
     $project = $this->createProject('my_project');
     $programmer = $this->createProgrammer([
-      'nickname' => 'Fred'
+      'nickname' => 'Fred',
+      'avatarNumber' => 5,   
     ], 'weaverryan');
     
     $data = array(

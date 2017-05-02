@@ -21,5 +21,13 @@ class BattleController extends BaseController {
     if(!$form->isValid()){
       $this->throwApiProblemValidationException($form);
     }
+    
+    //todo - set Location header
+    $battle = $this->getBattleManager()->battle(
+      $battleModel->getProgrammer(),
+      $battleModel->getProject()
+    );
+    
+    return $this->createApiResponse($battle, 201);
   }
 }
