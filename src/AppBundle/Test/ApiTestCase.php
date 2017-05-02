@@ -1,7 +1,8 @@
 <?php
-
 namespace AppBundle\Test;
+
 use AppBundle\Entity\Programmer;
+use AppBundle\Entity\Project;
 use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
@@ -16,27 +17,35 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-class ApiTestCase extends KernelTestCase{
+
+class ApiTestCase extends KernelTestCase {
   private static $staticClient;
+
   /**
    * @var array
    */
   private static $history = array();
+
   /**
    * @var Client
    */
   protected $client;
+
   /**
    * @var ConsoleOutput
    */
   private $output;
+
   /**
    * @var FormatterHelper
    */
   private $formatterHelper;
+
   private $responseAsserter;
+
   public static function setUpBeforeClass(){
     $handler = HandlerStack::create();
+
     $handler->push(Middleware::history(self::$history));
     $handler->push(Middleware::mapRequest(function(RequestInterface $request) {
       $path = $request->getUri()->getPath();
@@ -44,8 +53,10 @@ class ApiTestCase extends KernelTestCase{
         $path = '/app_test.php' . $path;
       }
       $uri = $request->getUri()->withPath($path);
+
       return $request->withUri($uri);
     }));
+
     $baseUrl = getenv('TEST_BASE_URL');
     if (!$baseUrl) {
       static::fail('No TEST_BASE_URL environmental variable set in phpunit.xml.');
@@ -55,51 +66,64 @@ class ApiTestCase extends KernelTestCase{
       'http_errors' => false,
       'handler' => $handler
     ]);
+
     self::bootKernel();
   }
+
   protected function setUp(){
     $this->client = self::$staticClient;
     // reset the history
     self::$history = array();
+
     $this->purgeDatabase();
   }
+
   /**
    * Clean up Kernel usage in this test.
    */
   protected function tearDown(){
     // purposefully not calling parent class, which shuts down the kernel
   }
+
   protected function onNotSuccessfulTest(Exception $e){
     if ($lastResponse = $this->getLastResponse()) {
       $this->printDebug('');
       $this->printDebug('<error>Failure!</error> when making the following request:');
       $this->printLastRequestUrl();
       $this->printDebug('');
+
       $this->debugResponse($lastResponse);
     }
+
     throw $e;
   }
+
   private function purgeDatabase(){
     $purger = new ORMPurger($this->getService('doctrine')->getManager());
     $purger->purge();
-}
+  }
+
   protected function getService($id){
     return self::$kernel->getContainer()
       ->get($id);
   }
+
   protected function printLastRequestUrl(){
     $lastRequest = $this->getLastRequest();
+
     if ($lastRequest) {
       $this->printDebug(sprintf('<comment>%s</comment>: <info>%s</info>', $lastRequest->getMethod(), $lastRequest->getUri()));
     } else {
       $this->printDebug('No request was made.');
     }
   }
+
   protected function debugResponse(ResponseInterface $response){
     foreach ($response->getHeaders() as $name => $values) {
-      $this->printDebug(sprintf('%s: %s', $name, implode(', ', $values)));
+        $this->printDebug(sprintf('%s: %s', $name, implode(', ', $values)));
     }
     $body = (string) $response->getBody();
+
     $contentType = $response->getHeader('Content-Type');
     $contentType = $contentType[0];
     if ($contentType == 'application/json' || strpos($contentType, '+json') !== false) {
@@ -114,9 +138,11 @@ class ApiTestCase extends KernelTestCase{
     } else {
       // the response is HTML - see if we should print all of it or some of it
       $isValidHtml = strpos($body, '</body>') !== false;
+
       if ($isValidHtml) {
         $this->printDebug('');
         $crawler = new Crawler($body);
+
         // very specific to Symfony's error page
         $isError = $crawler->filter('#traces-0')->count() > 0
           || strpos($body, 'looks like something went wrong') !== false;
@@ -126,6 +152,7 @@ class ApiTestCase extends KernelTestCase{
         } else {
           $this->printDebug('HTML Summary (h1 and h2):');
         }
+
         // finds the h1 and h2 tags and prints them only
         foreach ($crawler->filter('h1, h2')->extract(array('_text')) as $header) {
           // avoid these meaningless headers
@@ -135,16 +162,19 @@ class ApiTestCase extends KernelTestCase{
           if (strpos($header, 'Logs') !== false) {
             continue;
           }
+
           // remove line breaks so the message looks nice
           $header = str_replace("\n", ' ', trim($header));
           // trim any excess whitespace "foo   bar" => "foo bar"
           $header = preg_replace('/(\s)+/', ' ', $header);
+
           if ($isError) {
             $this->printErrorBlock($header);
           } else {
             $this->printDebug($header);
           }
         }
+
         /*
          * When using the test environment, the profiler is not active
          * for performance. To help debug, turn it on temporarily in
@@ -159,6 +189,7 @@ class ApiTestCase extends KernelTestCase{
             $fullProfilerUrl
           ));
         }
+
         // an extra line for spacing
         $this->printDebug('');
       } else {
@@ -166,6 +197,7 @@ class ApiTestCase extends KernelTestCase{
       }
     }
   }
+
   /**
    * Print a message out - useful for debugging
    *
@@ -175,8 +207,10 @@ class ApiTestCase extends KernelTestCase{
     if ($this->output === null) {
       $this->output = new ConsoleOutput();
     }
+
     $this->output->writeln($string);
   }
+
   /**
    * Print a debugging message out in a big red block
    *
@@ -187,8 +221,10 @@ class ApiTestCase extends KernelTestCase{
       $this->formatterHelper = new FormatterHelper();
     }
     $output = $this->formatterHelper->formatBlock($string, 'bg=red;fg=white', true);
+
     $this->printDebug($output);
   }
+
   /**
    * @return RequestInterface
    */
@@ -196,10 +232,14 @@ class ApiTestCase extends KernelTestCase{
     if (!self::$history || empty(self::$history)) {
       return null;
     }
+
     $history = self::$history;
+
     $last = array_pop($history);
+
     return $last['request'];
   }
+
   /**
    * @return ResponseInterface
    */
@@ -207,49 +247,82 @@ class ApiTestCase extends KernelTestCase{
     if (!self::$history || empty(self::$history)) {
       return null;
     }
+
     $history = self::$history;
+
     $last = array_pop($history);
+
     return $last['response'];
   }
+
   protected function createUser($username, $plainPassword = 'foo'){
     $user = new User();
     $user->setUsername($username);
     $user->setEmail($username.'@foo.com');
     $password = $this->getService('security.password_encoder')
-        ->encodePassword($user, $plainPassword);
+      ->encodePassword($user, $plainPassword);
     $user->setPassword($password);
+
     $em = $this->getEntityManager();
     $em->persist($user);
     $em->flush();
+
     return $user;
   }
-  protected function createProgrammer(array $data){
+
+  protected function getAuthorizedHeaders($username, $headers = array()){
+    $token = $this->getService('lexik_jwt_authentication.encoder')
+      ->encode(['username' => $username]);
+
+    $headers['Authorization'] = 'Bearer '.$token;
+
+    return $headers;
+  }
+
+  protected function createProgrammer(array $data, $ownerUsername = null){
+    if ($ownerUsername) {
+      $owner = $this->getEntityManager()
+        ->getRepository('AppBundle:User')
+        ->findOneBy(['username' => $ownerUsername]);
+    } else {
+      $owner = $this->getEntityManager()
+        ->getRepository('AppBundle:User')
+        ->findAny();
+    }
+
     $data = array_merge(array(
       'powerLevel' => rand(0, 10),
-      'user' => $this->getEntityManager()
-        ->getRepository('AppBundle:User')
-        ->findAny()
+      'user' => $owner,
+      'avatarNumber' => rand(1, 6)
     ), $data);
+
     $accessor = PropertyAccess::createPropertyAccessor();
     $programmer = new Programmer();
     foreach ($data as $key => $value) {
       $accessor->setValue($programmer, $key, $value);
     }
+
     $this->getEntityManager()->persist($programmer);
     $this->getEntityManager()->flush();
+
     return $programmer;
   }
-  
-  protected function getAuthorizedHeaders($username, $headers = array()) {
-    $token = $this->getService('lexik_jwt_authentication.encoder')
-      ->encode([
-        'username' => $username
-      ]); 
-    
-    $headers['Authorization'] = 'Bearer ' . $token;
-    
-    return $headers;
+
+  /**
+   * @param string $name
+   * @return Project
+   */
+  protected function createProject($name){
+    $project = new Project();
+    $project->setName($name);
+    $project->setDifficultyLevel(rand(1, 10));
+
+    $this->getEntityManager()->persist($project);
+    $this->getEntityManager()->flush();
+
+    return $project;
   }
+
   /**
    * @return ResponseAsserter
    */
@@ -257,14 +330,17 @@ class ApiTestCase extends KernelTestCase{
     if ($this->responseAsserter === null) {
       $this->responseAsserter = new ResponseAsserter();
     }
+
     return $this->responseAsserter;
   }
+
   /**
    * @return EntityManager
    */
   protected function getEntityManager(){
     return $this->getService('doctrine.orm.entity_manager');
   }
+
   /**
    * Call this when you want to compare URLs in a test
    *
@@ -276,4 +352,5 @@ class ApiTestCase extends KernelTestCase{
   protected function adjustUri($uri){
     return '/app_test.php'.$uri;
   }
+
 }
