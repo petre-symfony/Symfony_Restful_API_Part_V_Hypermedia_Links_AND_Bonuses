@@ -100,4 +100,20 @@ class Battle{
   public function getNotes(){
     return $this->notes;
   }
+  
+  /**
+   * @Serializer\VirtualProperty()
+   * @Serializer\SerializedName("programmer")
+   */
+  public function getProgrammerNickname(){
+    return $this->programmer->getNickname();  
+  }
+  
+  /**
+   * @Serializer\VirtualProperty()
+   * @Serializer\SerializedName("project")
+   */
+  public function getProjectId(){
+    return $this->project->getId();  
+  }
 }
