@@ -3,6 +3,7 @@
 namespace AppBundle\Test;
 use AppBundle\Entity\Programmer;
 use AppBundle\Entity\User;
+use AppBundle\Entity\Project;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Exception;
@@ -275,5 +276,20 @@ class ApiTestCase extends KernelTestCase{
    */
   protected function adjustUri($uri){
     return '/app_test.php'.$uri;
+  }
+  
+  /**
+   * @param string $name
+   * @return Project
+   */
+  protected function createProject($name){
+    $project = new Project();
+    $project->setName($name);
+    $project->setDifficultyLevel(rand(1,10));
+    
+    $this->getEntityManager()->persist($project);
+    $this->getEntityManager()->flush();
+    
+    return $project;
   }
 }
