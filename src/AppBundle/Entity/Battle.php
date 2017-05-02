@@ -3,8 +3,10 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
+ * @Serializer\ExclusionPolicy("all")
  * @ORM\Table(name="battle_battle")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\BattleRepository")
  */
@@ -13,6 +15,7 @@ class Battle{
    * @ORM\Column(name="id", type="integer")
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="AUTO")
+   * @Serializer\Expose()
    */
   private $id;
 
@@ -30,16 +33,19 @@ class Battle{
 
   /**
    * @ORM\Column(type="boolean")
+   * @Serializer\Expose()
    */
   private $didProgrammerWin;
 
   /**
    * @ORM\Column(type="datetime")
+   * @Serializer\Expose()
    */
   private $foughtAt;
 
   /**
    * @ORM\Column(type="text")
+   * @Serializer\Expose()
    */
   private $notes;
 
@@ -47,6 +53,7 @@ class Battle{
    * Battle constructor.
    * @param $programmer
    * @param $project
+   * 
    */
   public function __construct(Programmer $programmer, Project $project){
     $this->programmer = $programmer;
