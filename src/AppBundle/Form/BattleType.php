@@ -11,10 +11,10 @@ class BattleType extends AbstractType {
  
   public function buildForm(FormBuilderInterface $builder, array $options){
     $builder
-      ->add('project', EntityType::class, [
+      ->add('projectId', EntityType::class, [
         'class' => 'AppBundle\Entity\Project'
       ])
-      ->add('programmer', EntityType::class, [
+      ->add('programmerId', EntityType::class, [
         'class' => 'AppBundle\Entity\Programmer'
       ]);  
     } 
