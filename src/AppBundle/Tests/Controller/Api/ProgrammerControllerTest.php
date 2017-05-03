@@ -23,7 +23,7 @@ class ProgrammerControllerTest extends ApiTestCase{
     );
     $this->assertEquals(201, $response->getStatusCode());
     $this->assertTrue($response->hasHeader('Location'));
-    $this->assertEquals('application/hal+json', $response->getHeader('Content-Type')[0]);
+    $this->assertEquals('application/vnd.codebattles+json', $response->getHeader('Content-Type')[0]);
     $this->assertStringEndsWith('/api/programmers/ObjectOrienter', $response->getHeader('Location')[0]);
     $finishedData = json_decode($response->getBody(true), true);
     $this->assertArrayHasKey('nickname', $finishedData);

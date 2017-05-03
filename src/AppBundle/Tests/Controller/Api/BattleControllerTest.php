@@ -38,7 +38,6 @@ class BattleControllerTest extends ApiTestCase {
       'programmer.nickname',
       'Fred'
     );
-    $this->debugResponse($response);
     //to do later
     //$this->assertTrue($response->hasHeader('Location'))
   }
