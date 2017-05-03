@@ -60,7 +60,7 @@ class BattleControllerTest extends ApiTestCase {
     $this->asserter()->assertResponsePropertyEquals(
       $response,
       'errors.programmerId[0]', 
-      '????'
+      'This value is not valid.'
     );
   }
 }
