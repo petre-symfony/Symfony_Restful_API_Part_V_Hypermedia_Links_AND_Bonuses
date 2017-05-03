@@ -34,6 +34,7 @@ class BattleControllerTest extends ApiTestCase {
       '_links.programmer.href',
       $this->adjustUri('/api/programmers/Fred')
     );
+    $this->debugResponse($response);
     //to do later
     //$this->assertTrue($response->hasHeader('Location'))
   }
