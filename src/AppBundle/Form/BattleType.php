@@ -10,6 +10,8 @@ use AppBundle\Form\Model\BattleModel;
 class BattleType extends AbstractType {
  
   public function buildForm(FormBuilderInterface $builder, array $options){
+    $user = $options['user'];
+    
     $builder
       ->add('projectId', EntityType::class, [
         'class' => 'AppBundle\Entity\Project',
@@ -26,5 +28,6 @@ class BattleType extends AbstractType {
       'data_class' => BattleModel::class,
       'csrf_protection' => false  
     ]);  
+    $resolver->setRequired('user');
   }
 }
