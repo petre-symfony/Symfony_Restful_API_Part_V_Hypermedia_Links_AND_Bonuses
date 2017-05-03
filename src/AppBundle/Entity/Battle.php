@@ -3,16 +3,27 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
+ * @Serializer\ExclusionPolicy("all")
  * @ORM\Table(name="battle_battle")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\BattleRepository")
+ * @Hateoas\Relation(
+ *   "programmer",
+ *   href=@Hateoas\Route(
+ *     "api_programmers_show",
+ *     parameters={"nickname"= "expr(object.getProgrammerNickname())"}
+ *   )
+ * )
  */
 class Battle{
   /**
    * @ORM\Column(name="id", type="integer")
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="AUTO")
+   * @Serializer\Expose()
    */
   private $id;
 
@@ -30,16 +41,19 @@ class Battle{
 
   /**
    * @ORM\Column(type="boolean")
+   * @Serializer\Expose()
    */
   private $didProgrammerWin;
 
   /**
    * @ORM\Column(type="datetime")
+   * @Serializer\Expose()
    */
   private $foughtAt;
 
   /**
    * @ORM\Column(type="text")
+   * @Serializer\Expose()
    */
   private $notes;
 
@@ -47,6 +61,7 @@ class Battle{
    * Battle constructor.
    * @param $programmer
    * @param $project
+   * 
    */
   public function __construct(Programmer $programmer, Project $project){
     $this->programmer = $programmer;
@@ -92,5 +107,21 @@ class Battle{
 
   public function getNotes(){
     return $this->notes;
+  }
+  
+  /**
+   * @Serializer\VirtualProperty()
+   * @Serializer\SerializedName("programmer")
+   */
+  public function getProgrammerNickname(){
+    return $this->programmer->getNickname();  
+  }
+  
+  /**
+   * @Serializer\VirtualProperty()
+   * @Serializer\SerializedName("project")
+   */
+  public function getProjectId(){
+    return $this->project->getId();  
   }
 }
