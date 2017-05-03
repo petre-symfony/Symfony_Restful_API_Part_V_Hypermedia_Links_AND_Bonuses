@@ -28,7 +28,6 @@ class BattleControllerTest extends ApiTestCase {
     $this->assertEquals(201, $response->getStatusCode());
     $this->asserter()->assertResponsePropertyExists($response, 'didProgrammerWin');
     $this->asserter()->assertResponsePropertyEquals($response, 'project', $project->getId());
-    $this->asserter()->assertResponsePropertyEquals($response, 'programmer', 'Fred');
     $this->asserter()->assertResponsePropertyEquals(
       $response, 
       '_links.programmer',
@@ -36,9 +35,10 @@ class BattleControllerTest extends ApiTestCase {
     );
     $this->asserter()->assertResponsePropertyEquals(
       $response, 
-      '_embedded.programmer.nickname',
+      'programmer.nickname',
       'Fred'
     );
+    $this->debugResponse($response);
     //to do later
     //$this->assertTrue($response->hasHeader('Location'))
   }
