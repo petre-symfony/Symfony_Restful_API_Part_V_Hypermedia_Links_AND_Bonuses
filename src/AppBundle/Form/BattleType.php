@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use AppBundle\Form\Model\BattleModel;
+use AppBundle\Repository\ProgrammerRepository;
 
 class BattleType extends AbstractType {
  
@@ -19,7 +20,10 @@ class BattleType extends AbstractType {
       ])
       ->add('programmerId', EntityType::class, [
         'class' => 'AppBundle\Entity\Programmer',
-        'property_path' => 'programmer' 
+        'property_path' => 'programmer',
+        'query_builder' => function(ProgrammerRepository $repo) use ($user){
+          return $repo->createQueryBuilderForUser($user);
+        } 
       ]);  
     } 
    
