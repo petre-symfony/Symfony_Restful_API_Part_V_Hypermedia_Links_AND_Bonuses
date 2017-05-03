@@ -34,10 +34,11 @@ class BattleControllerTest extends ApiTestCase {
   }
   
   public function testPOSTBattleValidationErrors(){
+    $this->createUser('someone_else');
     $programmer = $this->createProgrammer([
       'nickname' => 'Fred',
       'avatarNumber' => 5,   
-    ], 'weaverryan');
+    ], 'someone_else');
     
     $data = array(
       'projectId'    => null,
@@ -55,6 +56,11 @@ class BattleControllerTest extends ApiTestCase {
       $response,
       'errors.projectId[0]', 
       'This value should not be blank.'
+    );
+    $this->asserter()->assertResponsePropertyEquals(
+      $response,
+      'errors.programmerId[0]', 
+      '????'
     );
   }
 }
