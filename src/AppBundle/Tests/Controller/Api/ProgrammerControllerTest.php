@@ -2,6 +2,7 @@
 namespace AppBundle\Tests\Controller\Api;
 
 use AppBundle\Test\ApiTestCase;
+use AppBundle\Battle\BattleManager;
 
 class ProgrammerControllerTest extends ApiTestCase{
   protected function setUp(){
@@ -23,6 +24,7 @@ class ProgrammerControllerTest extends ApiTestCase{
     );
     $this->assertEquals(201, $response->getStatusCode());
     $this->assertTrue($response->hasHeader('Location'));
+    $this->assertEquals('application/vnd.codebattles+json', $response->getHeader('Content-Type')[0]);
     $this->assertStringEndsWith('/api/programmers/ObjectOrienter', $response->getHeader('Location')[0]);
     $finishedData = json_decode($response->getBody(true), true);
     $this->assertArrayHasKey('nickname', $finishedData);
@@ -50,6 +52,32 @@ class ProgrammerControllerTest extends ApiTestCase{
       $this->adjustUri('/api/programmers/UnitTester')
     );
   }
+  
+  public function testFollowProgrammerBattlesLink(){
+    $programmer = $this->createProgrammer(array(
+      'nickname' => 'UnitTester',
+      'avatarNumber' => 3,
+    ));
+    $project = $this->createProject('cool_project');
+    
+    /** @var BattleManager $battleManager */
+    $battleManager = $this->getService('battle.battle_manager');
+    $battleManager->battle($programmer, $project);
+    $battleManager->battle($programmer, $project);
+    $battleManager->battle($programmer, $project);
+    
+    $response = $this->client->get('/api/programmers/UnitTester', [
+      'headers' => $this->getAuthorizedHeaders('weaverryan')
+    ]);
+    $uri = $this->asserter()
+      ->readResponseProperty($response, '_links.battles');
+    $response = $this->client->get($uri, [
+      'headers' => $this->getAuthorizedHeaders('weaverryan')
+    ]);
+    
+    $this->asserter()->assertResponsePropertyExists($response, 'items');
+  }
+  
   public function testGETProgrammerDeep(){
     $this->createProgrammer(array(
       'nickname' => 'UnitTester',
@@ -241,6 +269,20 @@ EOF;
     ]);
     $this->assertEquals(401, $response->getStatusCode());
     $this->assertEquals('application/problem+json', $response->getHeader('Content-Type')[0]);
-    $this->debugResponse($response);
+  }
+  
+  public function testEditTagLine(){
+     $this->createProgrammer(array(
+      'nickname' => 'UnitTester',
+      'avatarNumber' => 3,
+      'tagLine' => 'The original UnitTester'   
+    ));
+     
+    $response = $this->client->put('/api/programmers/UnitTester/tagLine' ,[
+      'headers' => $this->getAuthorizedHeaders('weaverryan'),
+      'body'    => 'New Tag Line'  
+    ]);
+    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertEquals('New Tag Line', (string) $response->getBody());
   }
 }
