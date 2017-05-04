@@ -159,4 +159,19 @@ class ProgrammerController extends BaseController{
     
     return $this->createApiResponse($collection); 
   }
+  
+  /**
+   * @Route("/api/programmers/{nickname}/tagLine")
+   * @Method("PUT")
+   */
+  public function editTaglineAction(Programmer $programmer, Request $request){
+    $programmer->setTagLine($request->getContent());
+    $em = $this->getDoctrine()->getManager();
+    $em->persist($programmer);
+    $em->flush();
+    
+    return new Response($programmer->getTagLine(), 200, [
+      'Content-Type' => 'text/plain'
+    ]);
+  }
 }
