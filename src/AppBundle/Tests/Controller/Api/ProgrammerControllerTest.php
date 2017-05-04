@@ -272,7 +272,7 @@ EOF;
   }
   
   public function testEditTagLine(){
-     $this->createProgrammer(array(
+    $this->createProgrammer(array(
       'nickname' => 'UnitTester',
       'avatarNumber' => 3,
       'tagLine' => 'The original UnitTester'   
@@ -284,5 +284,20 @@ EOF;
     ]);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertEquals('New Tag Line', (string) $response->getBody());
+  }
+  
+  public function testPowerUp(){
+    $this->createProgrammer(array(
+      'nickname' => 'UnitTester',
+      'avatarNumber' => 3,
+      'powerLevel'   => 10   
+    ));
+     
+    $response = $this->client->post('/api/programmers/UnitTester/powerup' ,[
+      'headers' => $this->getAuthorizedHeaders('weaverryan'),
+    ]); 
+    $this->assertEquals(200, $response->getStatusCode());
+    $powerLevel = $this->asserter()->readResponseProperty($response, 'powerLevel');
+    $this->assertNotEquals(10, $powerLevel);
   }
 }
