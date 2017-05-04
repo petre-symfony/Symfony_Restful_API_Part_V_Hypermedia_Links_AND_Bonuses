@@ -23,7 +23,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *   "battles",
  *   href=@Hateoas\Route(
- *     "???",
+ *     "api_programmers_battles_list",
  *     parameters={"nickname" = "expr(object.getNickname())"}
  *   )
  * )
