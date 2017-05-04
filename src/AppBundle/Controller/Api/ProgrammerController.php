@@ -8,6 +8,7 @@ use AppBundle\Controller\BaseController;
 use AppBundle\Entity\Programmer;
 use AppBundle\Form\ProgrammerType;
 use AppBundle\Form\UpdateProgrammerType;
+use AppBundle\Pagination\PaginatedCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -149,6 +150,7 @@ class ProgrammerController extends BaseController{
     $battles = $this->getDoctrine()->getRepository('AppBundle:Battle') 
       ->findBy(['programmer' => $programmer]);
     
-    return $this->createApiResponse($battles);  
+    $collection = new PaginatedCollection($battles, count($battles));
+    return $this->createApiResponse($collection); 
   }
 }
