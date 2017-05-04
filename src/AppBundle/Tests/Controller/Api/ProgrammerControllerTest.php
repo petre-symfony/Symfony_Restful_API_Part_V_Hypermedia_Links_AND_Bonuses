@@ -2,6 +2,7 @@
 namespace AppBundle\Tests\Controller\Api;
 
 use AppBundle\Test\ApiTestCase;
+use AppBundle\Battle\BattleManager;
 
 class ProgrammerControllerTest extends ApiTestCase{
   protected function setUp(){
@@ -51,6 +52,31 @@ class ProgrammerControllerTest extends ApiTestCase{
       $this->adjustUri('/api/programmers/UnitTester')
     );
   }
+  public function testFollowProgrammerBattlesLink(){
+    $programmer = $this->createProgrammer(array(
+      'nickname' => 'UnitTester',
+      'avatarNumber' => 3,
+    ));
+    $project = $this->createProject('cool_project');
+    
+    /** @var BattleManager $battleManager */
+    $battleManager = $this->getService('battle.battle_manager');
+    $battleManager->battle($programmer, $project);
+    $battleManager->battle($programmer, $project);
+    $battleManager->battle($programmer, $project);
+    
+    $response = $this->client->get('/api/programmers/UnitTester', [
+      'headers' => $this->getAuthorizedHeaders('weaverryan')
+    ]);
+    $uri = $this->asserter()
+      ->readResponseProperty($response, '_links.battles');
+    $response = $this->client->get($uri, [
+      'headers' => $this->getAuthorizedHeaders('weaverryan')
+    ]);
+    
+    $this->debugResponse($response);
+  }
+  
   public function testGETProgrammerDeep(){
     $this->createProgrammer(array(
       'nickname' => 'UnitTester',
