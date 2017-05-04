@@ -75,6 +75,7 @@ class ProgrammerControllerTest extends ApiTestCase{
       'headers' => $this->getAuthorizedHeaders('weaverryan')
     ]);
     
+    $this->asserter()->assertResponsePropertyExists($response, 'items');
     $this->debugResponse($response);
   }
   
