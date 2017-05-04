@@ -20,6 +20,13 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *    parameters = { "nickname": "expr(object.getNickname())" }
  *  )
  * )
+ * @Hateoas\Relation(
+ *   "battles",
+ *   href=@Hateoas\Route(
+ *     "???",
+ *     parameters={"nickname" = "expr(object.getNickname())"}
+ *   )
+ * )
  */
 class Programmer{
   /**
